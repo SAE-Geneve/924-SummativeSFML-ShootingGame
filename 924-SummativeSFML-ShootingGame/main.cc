@@ -76,6 +76,7 @@ int main()
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<float> x_gen(100, 1180);
 	std::uniform_real_distribution<float> y_gen(100, 720);
+	std::uniform_int_distribution<int> target_gen(0, targets_textures.size() - 1);
 
 	// Main loop
 	while (window.isOpen())
@@ -101,7 +102,7 @@ int main()
 
 				targets.emplace_back();
 				sf::Sprite& target = targets.back();
-				target.setTexture(targets_textures[0]);
+				target.setTexture(targets_textures[target_gen(gen)]);
 				target.setOrigin({ 114, 109 });
 				target.setPosition({ x_gen(gen), y_gen(gen) });
 
@@ -167,7 +168,7 @@ int main()
 
 		// Draw targets --------------------------------------------
 		// On affiche soit les cibles a tirer, soit le message de fin de partie (Perdu ou Gagne)
-		std::cout << "Targets missed : " << target_missed << "Time limit : " << time_limit << std::endl;
+		std::cout << "Targets missed : " << target_missed << " - Time limit : " << time_limit << '\n';
 		if (target_missed >= 5)
 		{
 			window.draw(game_over);
