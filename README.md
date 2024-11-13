@@ -7,7 +7,7 @@
 The program is a "Duck Shooting Game".
 You can shoot ducks clicking the mouse
 
-[Video]
+https://github.com/user-attachments/assets/8b0b584a-9b47-4f3d-a97b-faa7e442966a
 
 **You have to make it work as described above**
 
@@ -37,10 +37,6 @@ There are 3 kinds of bugs :
     * vector of targets, and accessors
     * add a target
     * remove a target
-
-
-https://github.com/user-attachments/assets/8b0b584a-9b47-4f3d-a97b-faa7e442966a
-
 
 ## don't forget use all tools on your disposal, debug windows and tabs, breakpoints, or your own projects and lecture ressources.
 ## uses of Chat GPT, or student-to-student communication is strictly forbidden 
