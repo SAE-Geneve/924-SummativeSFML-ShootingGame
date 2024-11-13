@@ -66,8 +66,10 @@ int main()
 
 	// Outils de gestion du temps
 	sf::Clock clock;
-	double time_elapsed = 0.0;
-	double time_limit = 2.0;
+	double target_dt = 0.0;
+	double target_period = 2.0;
+	double total_dt = 0.0;
+	constexpr double kMaxTime = 30;
 	int target_missed = 0;
 	int score = 0;
 
@@ -87,18 +89,39 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+
+			for (auto it = targets.begin(); it != targets.end(); )
+			{
+				if (event.type == sf::Event::MouseButtonReleased)
+				{
+					// Si le viseur collisionne avec une cible, celle ci est detruite
+					if (it->getGlobalBounds().intersects(crosshair.getGlobalBounds()))
+					{
+						// Apres une suppression, on recupere l'iterateur suivant
+						// => pas besoin de faire it++
+						it = targets.erase(it);
+						score++;
+						// On passe directement a l'iteration suivante
+						continue;
+					}
+				}
+
+				++it;
+			}
+
 		}
 
 		// Game logic --------------------------------------------
-		time_elapsed += clock.restart().asSeconds();
-		if (target_missed < 5 && !(time_limit <= 0.1))
+		float dt = clock.restart().asSeconds();
+		target_dt += dt;
+		total_dt += dt;
+
+		if (target_missed < 5 && total_dt < kMaxTime)
 		{
 			// Quand le temps est ecoule, on ajoute une cible
-			if (time_elapsed >= time_limit)
+			if (target_dt >= target_period)
 			{
-				time_elapsed = 0.0;
-				// Le temps limite diminue de 0.05 secondes a chaque nouvelle cible => le jeu devient plus difficile
-				time_limit -= 0.05;
+				target_dt = 0.0;
 
 				targets.emplace_back();
 				sf::Sprite& target = targets.back();
@@ -106,6 +129,12 @@ int main()
 				target.setOrigin({ 114, 109 });
 				target.setPosition({ x_gen(gen), y_gen(gen) });
 
+			}
+
+			// Le temps limite diminue de 0.1 secondes a chaque nouvelle cible => le jeu devient plus difficile
+			if (target_period > 0.15)
+			{
+				target_period -= 0.0001;
 			}
 
 			// Position du viseur sur la souris --------------------------------------------
@@ -123,29 +152,18 @@ int main()
 				{
 					// Apres une suppression, on recuppere l'iterateur suivant
 					// => pas besoin de faire it++
+					// On passe directement a l'iteration suivante
 					it = targets.erase(it);
 					target_missed++;
-					// On passe directement a l'iteration suivante
-					continue;
 
 				}
-
-				// Si le viseur collisionne avec une cible, celle ci est detruite
-				if (it->getGlobalBounds().intersects(crosshair.getGlobalBounds()))
+				else
 				{
-					if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-					{
-						// Apres une suppression, on recupere l'iterateur suivant
-						// => pas besoin de faire it++
-						it = targets.erase(it);
-						score++;
-						// On passe directement a l'iteration suivante
-						continue;
-					}
+					// Pas de suppression, alors on incremente l'iterateur
+					++it;
 				}
 
-				// Pas de suppression, alors on incremente l'iterateur
-				++it;
+
 			}
 		}
 
@@ -168,12 +186,12 @@ int main()
 
 		// Draw targets --------------------------------------------
 		// On affiche soit les cibles a tirer, soit le message de fin de partie (Perdu ou Gagne)
-		std::cout << "Targets missed : " << target_missed << " - Time limit : " << time_limit << '\n';
+		std::cout << "Targets missed : " << target_missed << " - Total Time : " << total_dt << " - Time limit : " << target_period << '\n';
 		if (target_missed >= 5)
 		{
 			window.draw(game_over);
 		}
-		else if (time_limit <= 0.1)
+		else if (total_dt >= kMaxTime)
 		{
 			window.draw(times_up);
 		}
