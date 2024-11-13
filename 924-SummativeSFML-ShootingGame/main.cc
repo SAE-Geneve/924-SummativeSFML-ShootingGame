@@ -88,12 +88,15 @@ int main()
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
-				window.close();
-
-			for (auto it = targets.begin(); it != targets.end(); )
 			{
-				if (event.type == sf::Event::MouseButtonReleased)
+				window.close();
+			}
+
+			if (event.type == sf::Event::MouseButtonReleased)
+			{
+				for (auto it = targets.begin(); it != targets.end(); )
 				{
+
 					// Si le viseur collisionne avec une cible, celle ci est detruite
 					if (it->getGlobalBounds().intersects(crosshair.getGlobalBounds()))
 					{
@@ -104,12 +107,14 @@ int main()
 						// On passe directement a l'iteration suivante
 						continue;
 					}
-				}
 
-				++it;
+					// Pas de suppression, alors on incremente l'iterateur
+					++it;
+				}
 			}
 
 		}
+
 
 		// Game logic --------------------------------------------
 		float dt = clock.restart().asSeconds();
@@ -249,8 +254,8 @@ int main()
 		// Dessin du viseur --------------------------------------------
 		window.draw(crosshair);
 		window.display();
-
 	}
 
 	return 0;
+
 }
